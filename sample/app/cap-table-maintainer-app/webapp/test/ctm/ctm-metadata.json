@@ -1,0 +1,80 @@
+{
+  "servicesEntitiesMap": {
+    "abfv": [
+      "Viewssf",
+      "Authors"
+    ],
+    "AdminService": [
+      "Books",
+      "Authors"
+    ]
+  },
+  "services": [
+    {
+      "name": "abfv",
+      "path": "/cat/"
+    },
+    {
+      "name": "AdminService",
+      "path": "/odata/v4/admin/"
+    }
+  ],
+  "entities": [
+    {
+      "name": "db",
+      "service": "samples"
+    },
+    {
+      "name": "db",
+      "service": "samples"
+    },
+    {
+      "name": "Viewssf",
+      "service": "abfv"
+    },
+    {
+      "name": "Authors",
+      "service": "abfv"
+    },
+    {
+      "name": "Books",
+      "service": "AdminService"
+    },
+    {
+      "name": "Authors",
+      "service": "AdminService"
+    },
+    {
+      "name": "common",
+      "service": "sap"
+    },
+    {
+      "name": "common",
+      "service": "sap"
+    },
+    {
+      "name": "common",
+      "service": "sap"
+    },
+    {
+      "name": "common",
+      "service": "sap"
+    },
+    {
+      "name": "common",
+      "service": "sap"
+    },
+    {
+      "name": "common",
+      "service": "sap"
+    },
+    {
+      "name": "common",
+      "service": "sap"
+    },
+    {
+      "name": "common",
+      "service": "sap"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+<mvc:View
+    controllerName="captablemaintainerapp.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core" 
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+>
+<Page
+        id="page"
+        title="{i18n>title}"
+    >
+     
+<Panel headerText="{i18n>selectionPanelHeaderText}" class="sapUiTinyMarginTopBottom">
+  
+  <HBox  alignItems="Start" justifyContent="Start" spacing="1rem">
+  
+  <!-- Service Dropdown -->
+  <Label text="Service : " labelFor="services" class="sapUiTinyMarginTop"/>
+  <Select id="services" change="onServicesDropdown" items="{ctmModel>/services}"  class="sapUiSmallMarginBegin sapUiMediumMarginEnd">
+    <items>
+      <core:Item key="{ctmModel>name}" text="{ctmModel>name}" />
+    </items>
+  </Select>
+
+  <!-- Entity Dropdown -->
+  <Label text="Entity : " labelFor="entities" class="sapUiTinyMarginTop" />
+  <Select id="entities" items="{ctmModel>/entities}"   class="sapUiSmallMarginBegin sapUiMediumMarginEnd">
+    <items>
+      <core:Item key="{ctmModel>name}" text="{ctmModel>name}" />
+    </items>
+  </Select>
+
+  <!-- Button -->
+  <Button text="Set Table" press="onTableSetPress" width="auto" />
+  
+</HBox>
+
+		</Panel>
+
+        <!-- Panel to hold the table -->
+        <Panel
+            id="myContent"
+            headerText="Table : {appView>/selectedTable}"
+			
+        >
+            <VBox>
+                <Table
+                    id="dynamicTable"
+                    inset="false"
+                    	growing="true"
+			growingThreshold="10"
+			mode="SingleSelectLeft"
+                >
+                    <headerToolbar>
+                        <OverflowToolbar>
+									<content>
+										<ToolbarSpacer/>
+										<SearchField
+											id="searchField"
+											width="20%"
+											placeholder="{i18n>searchFieldPlaceholder}"
+											 enabled="false"
+											search=".onSearch"/>
+										<Button
+											id="addUserButton"
+											icon="sap-icon://add"
+											tooltip="{i18n>createButtonText}"
+											press=".onCreate">
+											<layoutData>
+												<OverflowToolbarLayoutData priority="NeverOverflow"/>
+											</layoutData>
+										</Button>
+										<Button
+											id="deleteUserButton"
+											icon="sap-icon://delete"
+											tooltip="{i18n>deleteButtonText}"
+											press=".onDelete">
+											<layoutData>
+												<OverflowToolbarLayoutData priority="NeverOverflow"/>
+											</layoutData>
+										</Button>
+										<Button
+											id="refreshUsersButton"
+											icon="sap-icon://refresh"
+											tooltip="{i18n>refreshButtonText}"
+											press=".onRefresh"/>
+										<!-- <Button
+											id="sortUsersButton"
+											icon="sap-icon://sort"
+											tooltip="{i18n>sortButtonText}"
+											press="onSort"/> -->
+									</content>
+								</OverflowToolbar>
+                    </headerToolbar>
+
+                    <columns />
+                    <!-- Dynamic columns will be added here -->
+                    <items>
+                        <ColumnListItem>
+                            <!-- Dynamic cells will be added here -->
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+        </Panel>
+        <footer>
+						<Toolbar visible="{appView>/hasUIChanges}">
+							<ToolbarSpacer/>
+							<Button
+								id="saveButton"
+								type="Emphasized"
+								text="{i18n>saveButtonText}"
+								enabled="{= ${message>/}.length === 0  }"
+								press=".onSave"/>
+							<Button
+								id="doneButton"
+								text="{i18n>cancelButtonText}"
+								press=".onResetChanges"/>
+						</Toolbar>
+					</footer>
+    </Page>
+</mvc:View>

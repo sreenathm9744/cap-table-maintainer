@@ -1,6 +1,6 @@
 {
   "name": "cap-table-maintainer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "table maintainance generator for sap cap apps",
   "main": "index.js",
   "bin": {
@@ -20,7 +20,14 @@
     "url": "git+https://github.com/sreenathm9744/cap-table-maintainer.git"
   },
   "keywords": [
-    "cap-table-maintainer"
+    "cap-table-maintainer",
+    "ctm",
+    "sap cap",
+    "odata v4",
+    "sap fiori ui5 freestyle",
+    "cap table maintenance generator",
+    "fiori table maintenance app",
+    "SAP CAP CRUD"
   ],
   "author": "Sreenath Mukundan",
   "license": "MIT",
