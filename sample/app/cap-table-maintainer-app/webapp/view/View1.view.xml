@@ -5,6 +5,7 @@
     xmlns="sap.m"
     xmlns:html="http://www.w3.org/1999/xhtml"
     xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+	xmlns:ui="sap.ui.table" 
 >
 <Page
         id="page"
@@ -45,14 +46,16 @@
 			
         >
             <VBox>
-                <Table
+                  <ui:Table
                     id="dynamicTable"
                     inset="false"
-                    	growing="true"
-			growingThreshold="10"
-			mode="SingleSelectLeft"
-                >
-                    <headerToolbar>
+                    growing="true"
+                    growingThreshold="10"
+                    mode="SingleSelectLeft"
+                    visibleRowCount="7"
+                    enableColumnReordering="true"
+                    enableColumnResize="true">
+                    <ui:extension>
                         <OverflowToolbar>
 									<content>
 										<ToolbarSpacer/>
@@ -92,16 +95,12 @@
 											press="onSort"/> -->
 									</content>
 								</OverflowToolbar>
-                    </headerToolbar>
+                    </ui:extension>
 
-                    <columns />
+                    <ui:columns />
                     <!-- Dynamic columns will be added here -->
-                    <items>
-                        <ColumnListItem>
-                            <!-- Dynamic cells will be added here -->
-                        </ColumnListItem>
-                    </items>
-                </Table>
+                   
+                </ui:Table>
             </VBox>
         </Panel>
         <footer>

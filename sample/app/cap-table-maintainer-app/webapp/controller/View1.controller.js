@@ -37,8 +37,8 @@ sap.ui.define([
             const ctmModelData = ctmModel.getData()
             const sService = this.getView().byId("services").getSelectedItem().getKey();
             const sEntity = this.getView().byId("entities").getSelectedItem().getKey();
-         
-           const oService=  ctmModelData.services.find(oData=> oData.name == sService)
+
+            const oService = ctmModelData.services.find(oData => oData.name == sService)
             const sServiceUrl = oService.path;
 
             this.oSelectedEntity = {
@@ -48,13 +48,13 @@ sap.ui.define([
 
             }
             this.aSelectedEntityKeys = [];
-            this.aSelectedEntityProperties = [];             
+            this.aSelectedEntityProperties = [];
 
             // Create the OData V4 Model
             var oModel = new ODataModel({
                 serviceUrl: sServiceUrl,
-                synchronizationMode: "None" 
-                
+                synchronizationMode: "None"
+
             });
 
             var oComponent = this.getOwnerComponent();
@@ -75,7 +75,7 @@ sap.ui.define([
 
                 // Process the metadata and create the table dynamically
                 const sSelectedService = this.oSelectedEntity.serviceName;
-                var oEntityType = oMetadata[sSelectedService];  // Adjust this based on the metadata structure
+                var oEntityType = oMetadata[sSelectedService];   
                 this._createTableColumns(oEntityType);
                 this._bindTableData(oEntityType);
             } catch (e) {
@@ -92,11 +92,20 @@ sap.ui.define([
             this.aSelectedEntityKeys = oEntityType['$Key'];
             this.aSelectedEntityProperties = [];
             const that = this;
+
             // Loop through the properties in the entity and create columns dynamically
             Object.keys(oEntityType).forEach(function (property) {
                 if (oEntityType[property].$kind === "Property") {
-                    var oColumn = new sap.m.Column({
-                        header: new sap.m.Text({ text: property })
+                    var oColumn = new sap.ui.table.Column({
+                        label: new sap.m.Text({ text: property }), // Column header
+                        template: new sap.m.Input({
+                            value: "{" + property + "}", // Binding each property dynamically
+                            editable: true, // Make each cell editable
+                            liveChange: that.onInputChange.bind(that)  
+                        }),
+                        sortProperty: property, // Enable sorting by the property
+                        filterProperty: property, // Enable filtering by the property
+                        minWidth: 160 // Set min column width
                     });
                     oTable.addColumn(oColumn);
                     that.aSelectedEntityProperties.push(property);
@@ -109,17 +118,17 @@ sap.ui.define([
             var oTable = this.byId("dynamicTable");
 
             // Define the path to the entity set
-            var sEntitySet = "/" + this.oSelectedEntity.entityName; // Adjust this based on the metadata
+            var sEntitySet = "/" + this.oSelectedEntity.entityName;  
 
-            // Create template for rows (ColumnListItem)
-            var oTemplate = new sap.m.ColumnListItem({
+            // Create template for rows (Row)
+            var oTemplate = new sap.ui.table.Row({
                 cells: Object.keys(oEntityType).filter(function (property) {
                     return oEntityType[property].$kind === "Property";
                 }).map(function (property) {
                     return new sap.m.Input({
                         value: "{" + property + "}", // Binding each property dynamically
                         editable: true, // Make each cell editable
-                        liveChange: this.onInputChange.bind(this) // Optional: Update model during live editing
+                        liveChange: this.onInputChange.bind(this)  
                     });
                 }.bind(this))
             });
@@ -127,28 +136,29 @@ sap.ui.define([
             console.log("Binding path: ", sEntitySet);
 
             // Bind the table rows using the correct entity set
-            oTable.bindItems({
+            oTable.bindRows({
                 path: sEntitySet, // Binding to the OData entity set
-                template: oTemplate,
+                template: oTemplate, // Row template
                 parameters: {
                     $count: true,
                     $$updateGroupId: 'saveBatch',
                     $$operationMode: 'Server',
-                    // $expand: "author", // Optional: Expand navigation properties (e.g., "author" relation)
                     $select: Object.keys(oEntityType).filter(function (property) {
                         return oEntityType[property].$kind === "Property";
                     }).join(",") // Select only the properties
                 },
                 events: {
                     dataReceived: function (oEvent) {
-                        
                     }
                 }
             });
         },
 
+
+
+
         onRefresh: function () {
-            var oBinding = this.byId("dynamicTable").getBinding("items");
+            var oBinding = this.byId("dynamicTable").getBinding("rows");
 
             if (oBinding.hasPendingChanges()) {
                 MessageBox.error(this._getText("refreshNotPossibleMessage"));
@@ -169,15 +179,15 @@ sap.ui.define([
                 sValue = oView.byId("searchField").getValue();
             const aFilters = [];
 
-            this.aSelectedEntityProperties.forEach((sProperty)=>{
-               const oFilter = new Filter(sProperty, FilterOperator.Contains, sValue);
-               aFilters.push(oFilter);
+            this.aSelectedEntityProperties.forEach((sProperty) => {
+                const oFilter = new Filter(sProperty, FilterOperator.Contains, sValue);
+                aFilters.push(oFilter);
             })
             var oCombinedFilter = new sap.ui.model.Filter({
                 filters: aFilters,
-                and: false  
+                and: false
             });
-            oView.byId("dynamicTable").getBinding("items").filter(oCombinedFilter,FilterType.Application);
+            oView.byId("dynamicTable").getBinding("rows").filter(oCombinedFilter, FilterType.Application);
         },
 
         onSort: function () {
@@ -197,16 +207,16 @@ sap.ui.define([
         onCreate: function () {
             const aEntityProperties = this.aSelectedEntityProperties
             const oDummyObject = aEntityProperties.reduce((obj, key) => {
-                obj[key] = '';
+                obj[key] = null;
                 return obj;
             }, {});
             var oList = this.byId("dynamicTable"),
-                oBinding = oList.getBinding("items"),
+                oBinding = oList.getBinding("rows"),
                 oContext = oBinding.create(oDummyObject);
 
             this._setUIChanges();
 
-            oList.getItems().some(function (oItem) {
+            oList.getRows().some(function (oItem) {
                 if (oItem.getBindingContext() === oContext) {
                     oItem.focus();
                     oItem.setSelected(true);
@@ -232,28 +242,63 @@ sap.ui.define([
             this.getView().getModel().submitBatch("saveBatch").then(fnSuccess, fnError);
             this._bTechnicalErrors = false; // If there were technical errors, a new save resets them.
         },
-        onDelete: function () {
-            var oContext,
-                oSelected = this.byId("dynamicTable").getSelectedItem(),
-                sPath;
+        onDelete: async function () {
+            var oTable = this.byId("dynamicTable");
+            var aSelectedIndices = oTable.getSelectedIndices();  
+            var aContexts = [];
+            var aPromises = []; // Array to collect promises for each deletion
 
-            if (oSelected) {
-                oContext = oSelected.getBindingContext();
-                sPath = oContext.getPath();
-                oContext.delete().then(function () {
-                    MessageToast.show(this._getText("deletionSuccessMessage", sPath));
-                }.bind(this), function (oError) {
-                    this._setUIChanges();
-                    if (oError.canceled) {
-                        MessageToast.show(this._getText("deletionRestoredMessage", sPath));
-                        return;
+            var aDeletedPaths = []; // Array to collect paths of successfully deleted entries
+            var aErrorMessages = []; // Array to collect error messages for failed deletions
+
+            if (aSelectedIndices.length > 0) {
+                 aSelectedIndices.forEach(function (iIndex) {
+                    var oContext = oTable.getContextByIndex(iIndex); // Get binding context for the selected row
+                    aContexts.push(oContext);
+                });
+                aContexts.forEach(function (oContext) {
+                    var sPath = oContext.getPath(); // Get the path to the selected row
+                    // Call the delete method on the context
+                    aPromises.push(oContext.delete().then(function () {
+                        // On success, push the path of the deleted entry to the success array
+                        aDeletedPaths.push(sPath);
+                    }.bind(this), function (oError) {
+                        // On error, push the error message to the error array
+                        if (oError.canceled) {
+                            aErrorMessages.push(this._getText("deletionRestoredMessage", sPath));
+                        } else {
+                            aErrorMessages.push(oError.message + ": " + sPath);
+                        }
+                    }.bind(this)));
+                }, this);
+
+                Promise.all(aPromises).then(function () {
+                    // After deletion, reset the selection
+                    oTable.removeSelectionInterval(0, aSelectedIndices.length - 1);
+
+                    // If there are successful deletions, show the success message
+                    if (aDeletedPaths.length > 0) {
+                        MessageToast.show(this._getText("deletionSuccessMessage", aDeletedPaths.join(", ")));
                     }
-                    MessageBox.error(oError.message + ": " + sPath);
+
+                    // If there are any errors, show the error message
+                    if (aErrorMessages.length > 0) {
+                        MessageBox.error(aErrorMessages.join("\n"));
+                    }
+
+
                 }.bind(this));
-                this._setUIChanges(true);
+
+                // In case no selection was made
+                this._setUIChanges();
+
+            } else {
+                // No row selected, show no selection message
+                MessageToast.show(this._getText("noSelectionMessage"));
             }
         },
-        _setBusy: function (bIsBusy) {
+
+          _setBusy: function (bIsBusy) {
             var oModel = this.getView().getModel("appView");
             oModel.setProperty("/busy", bIsBusy);
         },
@@ -284,7 +329,7 @@ sap.ui.define([
             bMessageOpen = true;
         },
         onResetChanges: function () {
-            this.byId("dynamicTable").getBinding("items").resetChanges();
+            this.byId("dynamicTable").getBinding("rows").resetChanges();
             this._bTechnicalErrors = false;
             this._setUIChanges();
         },
