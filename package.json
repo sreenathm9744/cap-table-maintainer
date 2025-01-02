@@ -1,6 +1,6 @@
 {
   "name": "cap-table-maintainer",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "table maintainance generator for sap cap apps",
   "main": "index.js",
   "bin": {

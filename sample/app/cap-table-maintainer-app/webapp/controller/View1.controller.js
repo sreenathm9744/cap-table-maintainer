@@ -33,6 +33,8 @@ sap.ui.define([
         },
 
         onTableSetPress: async function () {
+            this._setBusy(true);
+
             const ctmModel = this.getOwnerComponent().getModel("ctmModel");
             const ctmModelData = ctmModel.getData()
             const sService = this.getView().byId("services").getSelectedItem().getKey();
@@ -62,6 +64,8 @@ sap.ui.define([
             await this._loadMetadata();
             var oModel = this.getView().getModel("appView");
             oModel.setProperty("/selectedTable", this.oSelectedEntity.serviceName);
+            this._setBusy(false);
+
         },
 
         _loadMetadata: async function () {

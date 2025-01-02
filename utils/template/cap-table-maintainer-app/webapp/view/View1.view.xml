@@ -10,6 +10,7 @@
 <Page
         id="page"
         title="{i18n>title}"
+		 busy="{appView>/busy}"
     >
      
 <Panel headerText="{i18n>selectionPanelHeaderText}" class="sapUiTinyMarginTopBottom">
@@ -48,13 +49,7 @@
             <VBox>
                   <ui:Table
                     id="dynamicTable"
-                    inset="false"
-                    growing="true"
-                    growingThreshold="10"
-                    mode="SingleSelectLeft"
-                    visibleRowCount="7"
-                    enableColumnReordering="true"
-                    enableColumnResize="true">
+                      >
                     <ui:extension>
                         <OverflowToolbar>
 									<content>
